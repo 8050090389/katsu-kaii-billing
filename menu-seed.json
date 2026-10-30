@@ -1,0 +1,64 @@
+{
+  "_note": "veg: 1 = vegetarian, 0 = non-veg. Where the dish name does not say, it is marked non-veg until the owner confirms. Prices are 0 and dishes are hidden until a price is set.",
+  "categories": [
+    { "name": "Dumplings", "items": [
+      { "name": "Siu Mai - Chilli Oil", "veg": 0 },
+      { "name": "Cream Cheese Dumplings (Steamed/Pan-Fried)", "veg": 1 },
+      { "name": "Gyoza - Pan-Fried Dumplings", "veg": 0 },
+      { "name": "Korean Kimchi Dumplings", "veg": 0 },
+      { "name": "Truffle Mushroom Dumplings", "veg": 1 }
+    ] },
+    { "name": "Starters", "items": [
+      { "name": "Spring Rolls", "veg": 1 },
+      { "name": "Cream Cheese Cigars", "veg": 1 },
+      { "name": "Crispy Dragon Croquettes", "veg": 0 },
+      { "name": "Chicken Katsu", "veg": 0 },
+      { "name": "Korean Fried Chicken Wings", "veg": 0 }
+    ] },
+    { "name": "Noodles", "items": [
+      { "name": "KAIE Signature Noodles", "veg": 0 },
+      { "name": "Chow Mein", "veg": 0 },
+      { "name": "Dragon Wok Noodles", "veg": 0 },
+      { "name": "Thukpa (Tibetan Noodle Soup)", "veg": 0 },
+      { "name": "Pad Thai", "veg": 0 },
+      { "name": "Dan Dan Noodles", "veg": 0 }
+    ] },
+    { "name": "Rice", "items": [
+      { "name": "Burnt Garlic Fried Rice", "veg": 1 },
+      { "name": "Sichuan Fried Rice", "veg": 1 },
+      { "name": "Kimchi Fried Rice", "veg": 0 },
+      { "name": "Chilli Paneer Rice Bowl", "veg": 1 },
+      { "name": "Nasi Goreng", "veg": 0 }
+    ] },
+    { "name": "Mains", "items": [
+      { "name": "Wok-Tossed Chicken", "veg": 0 },
+      { "name": "Yuzu Miso Chicken", "veg": 0 },
+      { "name": "Mutton Cumin BBQ", "veg": 0 },
+      { "name": "Wok-Tossed Paneer", "veg": 1 },
+      { "name": "Black Pepper Chicken", "veg": 0 },
+      { "name": "Sichuan Chicken", "veg": 0 },
+      { "name": "Sichuan Paneer", "veg": 1 },
+      { "name": "Mongolian Chicken", "veg": 0 },
+      { "name": "Mongolian Paneer", "veg": 1 },
+      { "name": "Salt & Pepper Chicken", "veg": 0 },
+      { "name": "Salt & Pepper Paneer", "veg": 1 }
+    ] },
+    { "name": "Soups", "items": [
+      { "name": "Hot & Sour Soup", "veg": 0 },
+      { "name": "Miso Soup", "veg": 0 },
+      { "name": "Sweet Corn Soup", "veg": 1 },
+      { "name": "Chicken Soup", "veg": 0 }
+    ] },
+    { "name": "Hot Pot", "items": [
+      { "name": "Hot Pot - Veg", "veg": 1 },
+      { "name": "Hot Pot - Chicken", "veg": 0 },
+      { "name": "Hot Pot - Mutton", "veg": 0 }
+    ] },
+    { "name": "Desserts", "items": [
+      { "name": "Tiramisu", "veg": 0 },
+      { "name": "Chocolate Tart", "veg": 1 },
+      { "name": "Mochi Ice Cream", "veg": 1 },
+      { "name": "Ice Cream Cake", "veg": 1 }
+    ] }
+  ]
+}

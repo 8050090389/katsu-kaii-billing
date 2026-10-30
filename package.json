@@ -1,0 +1,16 @@
+{
+  "name": "masala-mafia-billing",
+  "version": "1.2.0",
+  "description": "Billing, inventory and expense software for Masala Mafia (Katsu Kaii)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
