@@ -1,7 +1,6 @@
 const { Pool } = require('pg');
 const crypto = require('node:crypto');
 
-// Connect to Aiven PostgreSQL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { 
@@ -13,7 +12,6 @@ const pool = new Pool({
 let isDbReady = false;
 let dbReadyPromise = null;
 
-// Create tables if they don't exist
 function initDb() {
   if (dbReadyPromise) return dbReadyPromise;
   dbReadyPromise = (async () => {
@@ -43,11 +41,16 @@ function initDb() {
       if (parseInt(res.rows[0].count) === 0) {
         const hash = hashPassword('admin123');
         await pool.query('INSERT INTO users (name, username, pass_hash, role) VALUES ($1, $2, $3, $4)', ['Admin', 'admin', hash, 'admin']);
+      }
+      
+      const sec = await pool.query("SELECT * FROM settings WHERE key = 'secret'");
+      if (sec.rowCount === 0) {
         await pool.query('INSERT INTO settings (key, value) VALUES ($1, $2)', ['secret', crypto.randomBytes(32).toString('hex')]);
         await pool.query('INSERT INTO settings (key, value) VALUES ($1, $2)', ['restaurant_name', 'Katsu Kaii']);
         await pool.query('INSERT INTO settings (key, value) VALUES ($1, $2)', ['gst_rate', '5']);
         await pool.query('INSERT INTO settings (key, value) VALUES ($1, $2)', ['offer_zone_on', '0']);
       }
+      
       isDbReady = true;
     } catch (err) {
       console.error("Database init error:", err);
@@ -56,14 +59,13 @@ function initDb() {
   return dbReadyPromise;
 }
 
-// Export a wrapper so your server.js doesn't break
 const db = {
   prepare: (sql) => {
     let index = 0;
     const pgSql = sql.replace(/\?/g, () => `$${++index}`);
     return {
       get: async (...args) => {
-        await initDb(); // Wait for tables to be ready
+        await initDb(); 
         const res = await pool.query(pgSql, args);
         return res.rows[0];
       },
@@ -85,7 +87,6 @@ const db = {
   }
 };
 
-// Password hashing
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
   const hash = crypto.scryptSync(password, salt, 64).toString('hex');
@@ -99,9 +100,8 @@ function verifyPassword(password, stored) {
   return crypto.timingSafeEqual(Buffer.from(key, 'hex'), Buffer.from(hash, 'hex'));
 }
 
-// Dummy functions for server.js compatibility
 async function getSettings() {
-  await initDb(); // Wait for tables to be ready
+  await initDb(); 
   const res = await pool.query('SELECT * FROM settings');
   return Object.fromEntries(res.rows.map(r => [r.key, r.value]));
 }
