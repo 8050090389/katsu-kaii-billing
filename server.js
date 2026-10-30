@@ -5,7 +5,8 @@ const { db, getSettings, hashPassword, verifyPassword, autoBackup } = require('.
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+// CHANGED: Look for website files in the current directory instead of a 'public' folder
+app.use(express.static(__dirname));
 
 const SECRET = getSettings(true).secret;
 const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -126,7 +127,6 @@ app.put('/api/items/:id', adminOnly, wrap((req) => {
     .run(b.category_id, b.name, Number(b.price), b.veg ? 1 : 0, b.active ? 1 : 0, it.id);
   return { ok: true };
 }));
-// ---------- menu import (bundled menu-seed.json) and bulk price editor ----------
 const SAMPLE_DISHES = [['Chicken Katsu', 220], ['Paneer Katsu', 200], ['Katsu Curry Rice', 260], ['Veg Katsu Rice Bowl', 220], ['Masala Soda', 60], ['Cold Coffee', 110]];
 const SAMPLE_CATS = ['Katsu', 'Rice Bowls', 'Drinks'];
 function loadSeed() { return JSON.parse(require('node:fs').readFileSync(path.join(__dirname, 'menu-seed.json'), 'utf8')); }
@@ -190,7 +190,6 @@ app.delete('/api/tables/:id', adminOnly, wrap((req) => {
   db.prepare('DELETE FROM tables_ WHERE id=?').run(req.params.id); return { ok: true };
 }));
 
-// ---------- offers ----------
 app.get('/api/offers', adminOnly, wrap(() => db.prepare('SELECT * FROM offers ORDER BY active DESC, id DESC').all()));
 app.post('/api/offers', adminOnly, wrap((req) => {
   const { name, type, category_id, item_id, percent, flat_amount, min_bill, combo_item_ids, combo_price, start_date, end_date } = req.body;
@@ -225,7 +224,6 @@ app.put('/api/offers/:id', adminOnly, wrap((req) => {
 }));
 app.delete('/api/offers/:id', adminOnly, wrap((req) => { db.prepare('DELETE FROM offers WHERE id=?').run(req.params.id); return { ok: true }; }));
 
-// compute the biggest single matching offer discount for a cart
 function computeOfferDiscount(items, subtotal, type, settings) {
   if (settings.offer_zone_on !== '1') return { discount: 0, offer: null };
   if (type === 'aggregator') return { discount: 0, offer: null };
@@ -288,7 +286,6 @@ app.get('/api/active-offers', wrap((req) => {
   return { offers: listActiveOffers(type, getSettings()), zone_on: getSettings().offer_zone_on === '1' };
 }));
 
-// ---------- orders & billing ----------
 function calcTotals(subtotal, discount, offerDiscount, type, settings) {
   discount = Math.min(Math.max(Number(discount) || 0, 0), subtotal);
   offerDiscount = Math.min(Math.max(Number(offerDiscount) || 0, 0), subtotal - discount);
