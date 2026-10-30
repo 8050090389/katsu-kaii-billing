@@ -1,10 +1,13 @@
 const { Pool } = require('pg');
 const crypto = require('node:crypto');
 
-// Connect to Aiven PostgreSQL
+// Connect to Aiven PostgreSQL - Fixed SSL issue
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // Required for Aiven
+  ssl: { 
+    rejectUnauthorized: false,
+    checkServerIdentity: () => undefined 
+  }
 });
 
 // Create tables if they don't exist
