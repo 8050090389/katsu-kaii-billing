@@ -3,10 +3,7 @@ const crypto = require('node:crypto');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { 
-    rejectUnauthorized: false,
-    checkServerIdentity: () => undefined 
-  }
+  ssl: { rejectUnauthorized: false, checkServerIdentity: () => undefined }
 });
 
 let isDbReady = false;
@@ -36,7 +33,6 @@ function initDb() {
         CREATE TABLE IF NOT EXISTS day_close (id SERIAL PRIMARY KEY, date TEXT UNIQUE, opening_float REAL, expected_cash REAL, counted_cash REAL, difference REAL, note TEXT, closed_by INTEGER, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
       `);
 
-      // Create default admin if no users exist
       const res = await pool.query('SELECT COUNT(*) FROM users');
       if (parseInt(res.rows[0].count) === 0) {
         const hash = hashPassword('admin123');
@@ -50,7 +46,6 @@ function initDb() {
         await pool.query('INSERT INTO settings (key, value) VALUES ($1, $2)', ['gst_rate', '5']);
         await pool.query('INSERT INTO settings (key, value) VALUES ($1, $2)', ['offer_zone_on', '0']);
       }
-      
       isDbReady = true;
     } catch (err) {
       console.error("Database init error:", err);
@@ -64,27 +59,12 @@ const db = {
     let index = 0;
     const pgSql = sql.replace(/\?/g, () => `$${++index}`);
     return {
-      get: async (...args) => {
-        await initDb(); 
-        const res = await pool.query(pgSql, args);
-        return res.rows[0];
-      },
-      all: async (...args) => {
-        await initDb();
-        const res = await pool.query(pgSql, args);
-        return res.rows;
-      },
-      run: async (...args) => {
-        await initDb();
-        const res = await pool.query(pgSql, args);
-        return { lastInsertRowid: res.rows[0]?.id, changes: res.rowCount };
-      }
+      get: async (...args) => { await initDb(); const res = await pool.query(pgSql, args); return res.rows[0]; },
+      all: async (...args) => { await initDb(); const res = await pool.query(pgSql, args); return res.rows; },
+      run: async (...args) => { await initDb(); const res = await pool.query(pgSql, args); return { lastInsertRowid: res.rows[0]?.id, changes: res.rowCount }; }
     };
   },
-  exec: async (sql) => { 
-    await initDb(); 
-    await pool.query(sql); 
-  }
+  exec: async (sql) => { await initDb(); await pool.query(sql); }
 };
 
 function hashPassword(password) {
@@ -92,19 +72,16 @@ function hashPassword(password) {
   const hash = crypto.scryptSync(password, salt, 64).toString('hex');
   return `${salt}:${hash}`;
 }
-
 function verifyPassword(password, stored) {
   if (!stored) return false;
   const [salt, key] = stored.split(':');
   const hash = crypto.scryptSync(password, salt, 64).toString('hex');
   return crypto.timingSafeEqual(Buffer.from(key, 'hex'), Buffer.from(hash, 'hex'));
 }
-
 async function getSettings() {
   await initDb(); 
   const res = await pool.query('SELECT * FROM settings');
   return Object.fromEntries(res.rows.map(r => [r.key, r.value]));
 }
 function autoBackup() { }
-
 module.exports = { db, getSettings, hashPassword, verifyPassword, autoBackup };
