@@ -80,8 +80,9 @@ app.post('/api/me/password', wrap(async (req) => {
   return { ok: true };
 }));
 
-// Dummy routes to prevent the UI from crashing while you test login
+// This brings your dashboard back to life
 app.get('/api/dashboard', adminOnly, wrap(async () => {
+  const today = new Date().toISOString().slice(0, 10);
   return {
     now: new Date().toLocaleTimeString('en-IN', { hour12: false }),
     today: { total: 0, bills: 0, byMode: [] },
@@ -89,10 +90,13 @@ app.get('/api/dashboard', adminOnly, wrap(async () => {
     last7: [], top: [], low_stock: [], purchase_list: [], open_orders: 0, dues: [], unpriced: 0
   };
 }));
+
+// Other standard routes
 app.get('/api/orders', wrap(async () => []));
 app.get('/api/inventory', wrap(async () => []));
 app.get('/api/expenses', adminOnly, wrap(async () => []));
 app.get('/api/items/all', adminOnly, wrap(async () => []));
+app.get('/api/menu/import-status', adminOnly, wrap(async () => ({ total: 0, missing: 0, samples: 0 })));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`Masala Mafia Billing running on port ${PORT}`));
