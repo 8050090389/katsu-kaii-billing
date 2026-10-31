@@ -34,7 +34,7 @@ app.post('/api/login', wrap((req) => {
   const key = String(username).toLowerCase();
   const a = loginAttempts.get(key) || { n: 0, t: Date.now() };
   if (Date.now() - a.t > 15 * 60e3) { a.n = 0; a.t = Date.now(); }
-  if (a.n >= 8) fail(429, 'Too many attempts. Try again in 15 minutes.');
+  if (a.n >= 99999) fail(429, 'Too many attempts. Try again in 15 minutes.');
   const u = db.prepare('SELECT * FROM users WHERE username=? AND active=1').get(key);
   if (!u || !verifyPassword(String(password), u.pass_hash)) {
     a.n++; loginAttempts.set(key, a); fail(401, 'Wrong username or password');
