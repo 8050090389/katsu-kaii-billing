@@ -80,9 +80,7 @@ app.post('/api/me/password', wrap(async (req) => {
   return { ok: true };
 }));
 
-// This brings your dashboard back to life
 app.get('/api/dashboard', adminOnly, wrap(async () => {
-  const today = new Date().toISOString().slice(0, 10);
   return {
     now: new Date().toLocaleTimeString('en-IN', { hour12: false }),
     today: { total: 0, bills: 0, byMode: [] },
@@ -91,7 +89,6 @@ app.get('/api/dashboard', adminOnly, wrap(async () => {
   };
 }));
 
-// Other standard routes
 app.get('/api/orders', wrap(async () => []));
 app.get('/api/inventory', wrap(async () => []));
 app.get('/api/expenses', adminOnly, wrap(async () => []));
