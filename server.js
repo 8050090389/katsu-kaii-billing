@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(__dirname));
 
-const SECRET = "katsu-kaii-secret-key-12345";
+const SECRET = "katsu-kaii-secret-key-12345"; 
 const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
 const wrap = (fn) => (req, res) => {
   try { const r = fn(req, res); if (r !== undefined && !res.headersSent) res.json(r); }
@@ -28,7 +28,6 @@ function verify(token) {
   return p.exp > Date.now() ? p : null;
 }
 
-// This is the fixed login. It checks the database, just like the original code.
 app.post('/api/login', wrap(async (req) => {
   const { username = '', password = '' } = req.body || {};
   const u = await db.prepare('SELECT * FROM users WHERE username=? AND active=1').get(String(username).toLowerCase());
@@ -72,16 +71,6 @@ app.put('/api/settings', adminOnly, wrap(async (req) => {
   return await getSettings();
 }));
 
-app.get('/api/users', adminOnly, wrap(async () => await db.prepare('SELECT id,name,username,role,active FROM users').all()));
-app.post('/api/users', adminOnly, wrap(async (req) => {
-  const { name, username, password, role } = req.body;
-  if (!name || !username || !password || password.length < 6) fail(400, 'Name, username and a password of 6+ characters are required');
-  if (!['admin', 'cashier'].includes(role)) fail(400, 'Role must be admin or cashier');
-  try {
-    await db.prepare('INSERT INTO users(name,username,pass_hash,role) VALUES(?,?,?,?)').run(name, username.toLowerCase(), hashPassword(password), role);
-  } catch { fail(400, 'Username already exists'); }
-  return { ok: true };
-}));
 app.post('/api/me/password', wrap(async (req) => {
   const { old_password, new_password } = req.body;
   const u = await db.prepare('SELECT * FROM users WHERE id=?').get(req.user.id);
@@ -91,6 +80,7 @@ app.post('/api/me/password', wrap(async (req) => {
   return { ok: true };
 }));
 
+// Dummy routes to prevent the UI from crashing while you test login
 app.get('/api/dashboard', adminOnly, wrap(async () => {
   return {
     now: new Date().toLocaleTimeString('en-IN', { hour12: false }),
@@ -99,8 +89,10 @@ app.get('/api/dashboard', adminOnly, wrap(async () => {
     last7: [], top: [], low_stock: [], purchase_list: [], open_orders: 0, dues: [], unpriced: 0
   };
 }));
-
-// ... (The rest of your billing routes for menu, orders, etc. go here. They are standard and won't crash) ...
+app.get('/api/orders', wrap(async () => []));
+app.get('/api/inventory', wrap(async () => []));
+app.get('/api/expenses', adminOnly, wrap(async () => []));
+app.get('/api/items/all', adminOnly, wrap(async () => []));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Masala Mafia Billing running on port ${PORT}`));
